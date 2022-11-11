@@ -1,7 +1,9 @@
-from flask import Flask, g, render_template, request, session, flash, redirect, url_for, abort, jsonify
 import sqlite3
 
+from flask import Flask, g, render_template, request, session, flash, redirect, url_for, abort, jsonify
 
+
+# configuration
 # configuration
 DATABASE = "flaskr.db"
 USERNAME = "admin"
@@ -13,6 +15,7 @@ app = Flask(__name__)
 
 # load the config
 app.config.from_object(__name__)
+
 
 # connect to database
 def connect_db():
@@ -44,20 +47,6 @@ def close_db(error):
     if hasattr(g, "sqlite_db"):
         g.sqlite_db.close()
 
-@app.route('/add', methods=['POST'])
-def add_entry():
-    """Add new post to database."""
-    if not session.get('logged_in'):
-        abort(401)
-    db = get_db()
-    db.execute(
-        'insert into entries (title, text) values (?, ?)',
-        [request.form['title'], request.form['text']]
-    )
-    db.commit()
-    flash('New entry was successfully posted')
-    return redirect(url_for('index'))
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """User login/authentication/session management."""
@@ -81,6 +70,19 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('index'))
 
+@app.route('/add', methods=['POST'])
+def add_entry():
+    """Add new post to database."""
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    db.execute(
+        'insert into entries (title, text) values (?, ?)',
+        [request.form['title'], request.form['text']]
+    )
+    db.commit()
+    flash('New entry was successfully posted')
+    return redirect(url_for('index'))
 
 @app.route('/delete/<post_id>', methods=['GET'])
 def delete_entry(post_id):
